@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anniversarry Stars</title>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #000000, #000000);
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      perspective: 1000px;
+      height: 100vh;
+    }
+
+    .center-message {
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 2.4rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px #fff, 0 0 20px #f0f;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .scene {
+      width: 100vw;
+      height: 100vh;
+      transform-style: preserve-3d;
+      transform-origin: center;
+      position: relative;
+    }
+
+    .floating {
+      position: absolute;
+      font-weight: bold;
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+      text-shadow: 0 0 8px #fff, 0 0 12px #f0f, 0 0 20px #0ff;
+      color: white;
+      animation: fall linear infinite;
+    }
+
+    .floating:hover {
+      transform: scale(1.4);
+      color: #ffffcc;
+      z-index: 10;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100px) translateZ(var(--z));
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) translateZ(var(--z));
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="center-message"></div>
+  <div class="scene" id="scene"></div>
+
+  <script>
+    const scene = document.getElementById("scene");
+
+    const words = [
+      "Yêu Em ", "Anh Kiệt", "12.04.2023", " Happy Anniversary", "Bên nhau", "😺 ❤️ 💩",
+      "Cát Quỳnh", "Em Là Tất Cả", "Thương Bé Nhất", "Mãi Bên Nhau"
+    ];
+
+    const icons = ["💖", "✨", "🌟", "💕", "💫", "❤️", "🌸"];
+
+    function createFloating(text, delay, z) {
+      const el = document.createElement("div");
+      el.className = "floating";
+      el.textContent = text;
+      el.style.fontSize = `${Math.random() * 2 + 1}rem`;
+      el.style.left = `${Math.random() * 100}vw`;
+      el.style.animationDuration = `${10 + Math.random() * 10}s`;
+      el.style.animationDelay = `${delay}s`;
+      el.style.setProperty('--z', `${z}px`);
+      scene.appendChild(el);
+    }
+
+    for (let i = 0; i < 30; i++) {
+      createFloating(words[Math.floor(Math.random() * words.length)], Math.random() * 5, Math.random() * 800 - 400);
+    }
+
+    for (let i = 0; i < 20; i++) {
+      createFloating(icons[Math.floor(Math.random() * icons.length)], Math.random() * 5, Math.random() * 800 - 400);
+    }
+
+    // Xoay chuột + zoom
+    let rotateX = 0;
+    let rotateY = 0;
+    let isDragging = false;
+    let lastX, lastY;
+    let scale = 1;
+
+    document.addEventListener("mousedown", e => {
+      isDragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+
+    document.addEventListener("mousemove", e => {
+      if (isDragging) {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        rotateY += dx * 0.3;
+        rotateX -= dy * 0.3;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        updateTransform();
+      }
+    });
+
+    document.addEventListener("wheel", e => {
+      e.preventDefault();
+      scale += e.deltaY > 0 ? -0.1 : 0.1;
+      scale = Math.min(Math.max(0.5, scale), 3);
+      updateTransform();
+    }, { passive: false });
+
+    function updateTransform() {
+      scene.style.transform = `scale(${scale}) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    }
+  </script>
+</body>
+</html>
